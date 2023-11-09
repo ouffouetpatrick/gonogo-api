@@ -1,6 +1,6 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { EntityManager, Repository } from 'typeorm';
 import { isDefined } from 'class-validator';
 import { Response } from '../../core/shared/classes/response.class';
 import { TypeOrmHttpParamQuery } from '../../core/shared/classes/typeorm-query';
@@ -53,4 +53,17 @@ export class DomaineActiviteService {
     }
     return result;
   }
+
+  //Supprimer domaine activité
+  async supprimerDomaineActivite(manager: EntityManager, domaineActivite: any){
+    let domaineActiviteEntity = new DomaineActiviteEntity({
+        ...domaineActivite,
+        geler: 1,//Update le gele à 1 (1=supprimé, O=non supprimer)
+        dateCreation: new Date().toISOString(),//Update la date pour utiliser la date actuelle
+    });
+    
+    domaineActiviteEntity = await manager.save(domaineActiviteEntity);
+    return domaineActiviteEntity;
+  }
+
 }

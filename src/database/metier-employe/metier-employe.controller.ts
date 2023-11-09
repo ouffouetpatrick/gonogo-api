@@ -5,27 +5,28 @@ import { ParseJsonObjectPipe } from 'src/core/shared/pipes/json-object.pipe';
 import { UseInterceptors } from '@nestjs/common/decorators/core/use-interceptors.decorator';
 import { Catch } from '@nestjs/common/decorators/core/catch.decorator';
 import { Controller } from '@nestjs/common/decorators/core/controller.decorator';
-import { Delete, Get, Post, Put } from '@nestjs/common';
+import { Delete, Get, Post, Put, UseGuards } from '@nestjs/common';
 import { Body, Param } from '@nestjs/common/decorators/http/route-params.decorator';
 import { MetierEmployeDto } from './metier-employe.dto';
 import { MetierEmployeService } from './metier-employe.service';
-// import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { EntityManager, Transaction, TransactionManager } from 'typeorm';
 
 @Catch()
-// @UseInterceptors(LoggingInterceptor)
+@UseInterceptors(LoggingInterceptor)
 @Controller('metierEmploye')
 export class MetierEmployeController {
   constructor(private readonly metierEmployeService: MetierEmployeService) {}
 
   @Post()
-  // @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   async save(@Body(new ValidationPipe()) metierEmployeDto: MetierEmployeDto) {
     const result = await this.metierEmployeService.save(metierEmployeDto);
     return result;
   }
 
   @Put(':primaryKey')
-  // @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   async update(
     @Body(new ValidationPipe()) metierEmployeDto: MetierEmployeDto,
     @Param('primaryKey', new ParseJsonPipe()) primaryKey,
@@ -35,30 +36,39 @@ export class MetierEmployeController {
   }
 
   @Delete(':primaryKey')
-  // @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   async delete(@Param('primaryKey', new ParseJsonPipe()) primaryKey) {
     const result = await this.metierEmployeService.delete(primaryKey);
     return result;
   }
 
   @Get()
-  // @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   async find() {
     const result = await this.metierEmployeService.find({});
     return result;
   }
 
   @Get('query/:findOption')
-  // @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   async findQuery(@Param('findOption', new ParseJsonObjectPipe()) findOption) {
     const result = await this.metierEmployeService.find(findOption);
     return result;
   }
 
   @Get(':primaryKey')
-  // @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   async findById(@Param('primaryKey', new ParseJsonPipe()) primaryKey) {
     const result = await this.metierEmployeService.findById(primaryKey);
     return result;
   }
+
+  @Post('supprimerMetier')
+    @UseGuards(JwtAuthGuard)
+    @Transaction()
+    async supprimerMetier(@Body(new ValidationPipe()) metierEmployeDto: MetierEmployeDto,  @TransactionManager() manager: EntityManager) {
+        const result = this.metierEmployeService.supprimerMetier(manager, metierEmployeDto);
+        
+        return result
+    }
 }

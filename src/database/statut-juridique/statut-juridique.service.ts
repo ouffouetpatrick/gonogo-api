@@ -1,6 +1,6 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { EntityManager, Repository } from 'typeorm';
 import { isDefined } from 'class-validator';
 import { Response } from '../../core/shared/classes/response.class';
 import { TypeOrmHttpParamQuery } from '../../core/shared/classes/typeorm-query';
@@ -52,5 +52,17 @@ export class StatutJuridiqueService {
       );
     }
     return result;
+  }
+
+  //Supprimer statut juridique
+  async supprimerStatutJuridique(manager: EntityManager, statutJuridique: any){
+    let statutJuridiqueEntity = new StatutJuridiqueEntity({
+        ...statutJuridique,
+        geler: 1,//Update le gele à 1 (1=supprimé, O=non supprimer)
+        dateCreation: new Date().toISOString(),//Update la date pour utiliser la date actuelle
+    });
+    
+    statutJuridiqueEntity = await manager.save(statutJuridiqueEntity);
+    return statutJuridiqueEntity;
   }
 }

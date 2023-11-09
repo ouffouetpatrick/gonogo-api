@@ -4,11 +4,11 @@ import { LoggingInterceptor } from '../../core/shared/interceptors/logging.inter
 import { Transaction, TransactionManager, EntityManager } from 'typeorm';
 import { EntrepriseMetierService } from './entreprise.service';
 import { EntrepriseDto } from 'src/database/entreprise/entreprise.dto';
-// import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
-// import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
 
 @Catch()
-// @UseInterceptors(LoggingInterceptor)
+@UseInterceptors(LoggingInterceptor)
 @Controller('metier/entreprise')
 export class EntrepriseMetierController {
     constructor(
@@ -16,7 +16,7 @@ export class EntrepriseMetierController {
     ) {}
 
     @Post('ajouterEntreprise')
-    // @UseGuards(JwtAuthGuard)
+    @UseGuards(JwtAuthGuard)
     @Transaction()
     async AjouterEntreprise(@Body(new ValidationPipe()) entrepriseDto: EntrepriseDto,  @TransactionManager() manager: EntityManager) {
         const result = this.entrepriseMetierService.AjouterEntreprise(manager, entrepriseDto);
@@ -25,7 +25,7 @@ export class EntrepriseMetierController {
     }
 
     @Get('recupererEntreprise')
-    // @UseGuards(JwtAuthGuard)
+    @UseGuards(JwtAuthGuard)
     @Transaction()
     async recupererEntreprise(@TransactionManager() manager: EntityManager,) {
         const result = this.entrepriseMetierService.recupererEntreprise(manager);
@@ -34,7 +34,7 @@ export class EntrepriseMetierController {
     }
 
     @Post('supprimerEntreprise')
-    // @UseGuards(JwtAuthGuard)
+    @UseGuards(JwtAuthGuard)
     @Transaction()
     async supprimerEntreprise(@Body(new ValidationPipe()) entrepriseDto: EntrepriseDto,  @TransactionManager() manager: EntityManager) {
         const result = this.entrepriseMetierService.supprimerEntreprise(manager, entrepriseDto);
